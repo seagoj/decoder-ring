@@ -12,11 +12,11 @@ class XSalsa20Poly1305 extends Cipher
     public function __construct()
     {
         if (empty(static::$key)) {
-            static::$key = random_bytes(256);
+            static::$key = random_bytes(SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
         }
 
         if (empty(static::$nonce)) {
-            static::$nonce = random_bytes(192);
+            static::$nonce = random_bytes(SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);
         }
     }
 
@@ -27,12 +27,7 @@ class XSalsa20Poly1305 extends Cipher
      */
     public function decrypt(string $ciphertext) : string
     {
-        return sodium_crypto_aead_xsalsa20poly1305_ietf_decrypt(
-            $ciphertext,
-            static::$ad,
-            static::$nonce,
-            static::$key
-        );
+        return sodium_crypto_secretbox_open($ciphertext, static::$nonce, static::$key);
     }
 
     /**
@@ -42,11 +37,6 @@ class XSalsa20Poly1305 extends Cipher
      */
     public function encrypt(string $message) : string
     {
-        return sodium_crypto_aead_xsalsa20poly1305_ietf_encrypt(
-            $message,
-            static::$ad,
-            static::$nonce,
-            static::$key
-        );
+        return sodium_crypto_secretbox($message, static::$nonce, static::$key);
     }
 }

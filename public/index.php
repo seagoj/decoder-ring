@@ -1,6 +1,6 @@
 <?php namespace Seago\DecoderRing;
 
-require_once '../vendor/autoload.php';
+require_once '/application/vendor/autoload.php';
 
 $decoder_ring = new DecoderRing(__DIR__ . '/../data/data.txt');
 $decoder_ring->addCipher(new Ciphers\XChaCha20Poly1305);

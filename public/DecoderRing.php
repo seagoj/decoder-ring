@@ -31,12 +31,15 @@ class DecoderRing
      *
      * @return \Generator
      */
-    private function readFile(string $path) : \Generator
+    private function readFile() : \Generator
     {
-        $handle = fopen($path, 'r');
+        if (!file_exists($this->path)) {
+            throw new \Exception('Missing datafile.');
+        }
+        $handle = fopen($this->path, 'r');
         while(!feof($handle)) {
-            if (!is_bool($handle)) {
-                break;
+            if (is_bool(fgets($handle))) {
+                continue;
             }
             yield trim(fgets($handle));
         }
@@ -50,24 +53,39 @@ class DecoderRing
     {
         foreach ($this->ciphers as $cipher) {
             echo "## {$cipher->name}:<br \>";
-            echo "- encrypt:\t";
-            $start = microtime(true);
-            foreach ($this->readFile($this->path) as $row) {
-                $cipher->encrypt($row);
-            }
-            echo microtime(true) - $start . "<br />";
+            $enc_duration = 0.0;
+            $dec_duration = 0.0;
+            foreach ($this->readFile() as $row) {
+                $ciphertext = $this->profile(function () use ($cipher, $row) {
+                   return $cipher->encrypt($row);
+                }, $enc_duration);
 
-            echo "- roundtrip:\t";
-            $start = microtime(true);
-            foreach ($this->readFile($this->path) as $row) {
-                $decrypted = $cipher->decrypt(
-                    $cipher->encrypt($row)
-                );
-                if ($row != $decrypted) {
-                    throw new \Exception('Not two way.');
+                $message = $this->profile(function () use ($cipher, $ciphertext) {
+                    return $cipher->decrypt($ciphertext);
+                }, $dec_duration);
+
+                if ($message != $row) {
+                    throw new \Exception('Invalid cipher.');
                 }
             }
-            echo microtime(true) - $start . "<br /><br />";
+            echo "- encrypt:\t {$enc_duration}<br />";
+            echo "- decrypt:\t {$dec_duration}<br />";
         }
     }
+
+    /**
+     * @param callable $method
+     * @param float $duration
+     *
+     * @return mixed
+     */
+    private function profile(callable $method, float &$duration) {
+        $start = microtime(true);
+        $response = $method();
+        $stop = microtime(true);
+        $duration += ($stop-$start);
+
+        return $response;
+    }
+
 }

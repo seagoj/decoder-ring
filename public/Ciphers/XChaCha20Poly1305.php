@@ -12,11 +12,11 @@ class XChaCha20Poly1305 extends Cipher
     public function __construct()
     {
         if (empty(static::$key)) {
-            static::$key = random_bytes(256);
+            static::$key = random_bytes(SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_KEYBYTES);
         }
 
         if (empty(static::$nonce)) {
-            static::$nonce = random_bytes(192);
+            static::$nonce = random_bytes(SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_NPUBBYTES );
         }
     }
 
