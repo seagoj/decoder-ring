@@ -38,10 +38,11 @@ class DecoderRing
         }
         $handle = fopen($this->path, 'r');
         while(!feof($handle)) {
-            if (is_bool(fgets($handle))) {
+            $line = fgets($handle);
+            if (!is_string($line)) {
                 continue;
             }
-            yield trim(fgets($handle));
+            yield trim($line);
         }
         fclose($handle);
     }
@@ -70,6 +71,7 @@ class DecoderRing
             }
             echo "- encrypt:\t {$enc_duration}<br />";
             echo "- decrypt:\t {$dec_duration}<br />";
+            echo "<br />";
         }
     }
 
