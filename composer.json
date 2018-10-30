@@ -1,0 +1,15 @@
+{
+    "name": "seagoj/decoder-ring",
+    "authors": [
+        {
+            "name": "Jeremy Seago",
+            "email": "seagoj@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Seago\\DecoderRing\\": "public/"
+        }
+    }
+}
