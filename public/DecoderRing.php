@@ -31,9 +31,9 @@ class DecoderRing
      *
      * @return \Generator
      */
-    private function readFile() : \Generator
+    private function readFile(string $path = null) : \Generator
     {
-        if (!file_exists($this->path)) {
+        if (!file_exists($path ?? $this->path)) {
             throw new \Exception('Missing datafile.');
         }
         $handle = fopen($this->path, 'r');
@@ -54,6 +54,16 @@ class DecoderRing
     {
         foreach ($this->ciphers as $cipher) {
             echo "## {$cipher->name}:<br \>";
+
+            echo "- **unicode compatible**:\t";
+            foreach ($this->readFile(__DIR__ . '/../data/all-utf8.txt') as $row) {
+                $ciphertext = $cipher->encrypt($row);
+                $message = $cipher->decrypt($ciphertext);
+                if ($message != $row) {
+                    throw new \Exception('Invalid cipher.');
+                }
+            }
+            echo "pass<br/>";
             $enc_duration = 0.0;
             $dec_duration = 0.0;
             foreach ($this->readFile() as $row) {
@@ -69,8 +79,8 @@ class DecoderRing
                     throw new \Exception('Invalid cipher.');
                 }
             }
-            echo "- encrypt:\t {$enc_duration}<br />";
-            echo "- decrypt:\t {$dec_duration}<br />";
+            echo "- **encrypt**:\t {$enc_duration}<br />";
+            echo "- **decrypt**:\t {$dec_duration}<br />";
             echo "<br />";
         }
     }
