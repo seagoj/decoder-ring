@@ -66,6 +66,7 @@ class DecoderRing
             echo "pass<br/>";
             $enc_duration = 0.0;
             $dec_duration = 0.0;
+            $rows = 0;
             foreach ($this->readFile() as $row) {
                 $ciphertext = $this->profile(function () use ($cipher, $row) {
                    return $cipher->encrypt($row);
@@ -78,9 +79,11 @@ class DecoderRing
                 if ($message != $row) {
                     throw new \Exception('Invalid cipher.');
                 }
+                $rows++;
             }
             echo "- **encrypt**:\t {$enc_duration}<br />";
             echo "- **decrypt**:\t {$dec_duration}<br />";
+            echo "- **rows**:\t {$rows}<br />";
             echo "<br />";
         }
     }
