@@ -7,6 +7,9 @@
         }
     ],
     "require": {},
+    "scripts": {
+        "start": "docker-compose up"
+    },
     "autoload": {
         "psr-4": {
             "Seago\\DecoderRing\\": "public/"
